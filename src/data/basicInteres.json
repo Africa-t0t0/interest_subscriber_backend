@@ -1,0 +1,38 @@
+[
+    {
+      "name": "Formula 1",
+      "description": "A high-speed international motorsport featuring open-wheel racing cars competing in grand prix events worldwide.",
+      "icon": "🏎️"
+    },
+    {
+      "name": "Tennis",
+      "description": "A racket sport played individually or in doubles on a rectangular court divided by a net.",
+      "icon": "🎾"
+    },
+    {
+      "name": "UFC",
+      "description": "Ultimate Fighting Championship, a mixed martial arts competition featuring fighters from various disciplines.",
+      "icon": "🥊"
+    },
+    {
+      "name": "Soccer",
+      "description": "Also known as football, a team sport where two teams compete to score goals by getting the ball into the opposing team's net.",
+      "icon": "⚽"
+    },
+    {
+      "name": "Basketball",
+      "description": "A team sport where two teams try to score points by shooting a ball through a hoop elevated ten feet above the ground.",
+      "icon": "🏀"
+    },
+    {
+      "name": "Volleyball",
+      "description": "A team sport where two teams separated by a net try to score points by grounding a ball on the other team's court.",
+      "icon": "🏐"
+    },
+    {
+      "name": "Hockey",
+      "description": "A sport in which two teams use sticks to hit a puck or ball into the opponent's goal to score points.",
+      "icon": "🏒"
+    }
+  ]
+  
