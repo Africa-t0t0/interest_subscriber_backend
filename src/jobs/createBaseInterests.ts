@@ -3,6 +3,7 @@ import { InterestModel } from "../models/Interest";
 
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 
@@ -47,22 +48,21 @@ export async function createBaseInterests() {
 }
 
 
-
 async function main() {
-  try {
-    // 1. Conexión segura antes de cualquier uso de modelos
-    const dbProcessUri = String(process.env.DB_PROCESS_URI)
-    await mongoose.connect(dbProcessUri);
+    try {
+        // FIXME: fix this, don't use process.env.DB_PROCESS_URI
+        const dbProcessUri = String(process.env.DB_PROCESS_URI)
+        await mongoose.connect(dbProcessUri);
 
-    await createBaseInterests();
+        await createBaseInterests();
 
-    await mongoose.disconnect();
+        await mongoose.disconnect();
 
-    console.log("✅ DB seed completed successfully")
-  } catch (error) {
-    console.error("❌ Error in DB seed:", error);
-    await mongoose.disconnect();
-  }
+        console.log("✅ DB seed completed successfully")
+    } catch (error) {
+        console.error("❌ Error in DB seed:", error);
+        await mongoose.disconnect();
+    }
 }
 
 main();
