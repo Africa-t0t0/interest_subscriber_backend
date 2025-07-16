@@ -3,7 +3,9 @@ import { Schema, model, Types, Document } from "mongoose";
 export interface IEvent extends Document {
     title: string;
     description?: string;
-    date: Date;
+    creationDate: Date;
+    startDateRange: Date;
+    endDateRange: Date;
     location?: string;
     interests: Types.ObjectId[];
 };
@@ -12,7 +14,9 @@ export interface IEvent extends Document {
 const EventSchema = new Schema<IEvent>({
     title: { type: String, required: true },
     description: String,
-    date: { type: Date, required: true },
+    creationDate: { type: Date, default: Date.now },
+    startDateRange: { type: Date, required: true },
+    endDateRange: { type: Date, required: true},
     location: String,
     interests: [{ type: Schema.Types.ObjectId, ref: 'Interest' }]
 });
