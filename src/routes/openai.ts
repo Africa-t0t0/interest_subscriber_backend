@@ -5,11 +5,11 @@ const router = express.Router();
 
 const ENGINE = 'openai';
 
-router.get('/', (req: any, res: any) => {
+router.get("/", (req: any, res: any) => {
     res.send('API is running!');
 });
 
-router.get('/dummy', async (_: any, response: any) => {
+router.get("/dummy", async (_: any, response: any) => {
     const prompt = 'testing this api key, if it works, then respond with a json object {message: "success"}';
 
     try {
