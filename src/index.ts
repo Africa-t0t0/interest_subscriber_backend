@@ -13,7 +13,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/openai', openaiRoutes);
-app.use('/interest', interestRoutes);
+app.use('/api', interestRoutes);
 
 const port : number = PORT;
 

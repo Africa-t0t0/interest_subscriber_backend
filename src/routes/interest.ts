@@ -8,7 +8,7 @@ router.get("/", (req: any, res: any) => {
     res.send('API is running!');
 });
 
-router.get("/get-interests", async (_: any, response: any) => {
+router.get("/interests", async (_: any, response: any) => {
     try {
         const interests = await getAll(InterestModel);
         response.json(interests);
@@ -18,7 +18,7 @@ router.get("/get-interests", async (_: any, response: any) => {
     }
 });
 
-router.get("/get-interests/:id", async (request: any, response: any) => {
+router.get("/interests/:id", async (request: any, response: any) => {
     try {
         const { id } = request.params;
         const interest = await getById(InterestModel, id);
