@@ -10,8 +10,11 @@ const openai = new OpenAI({
 export async function askOpenAI(message: string): Promise<string> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{role: "user", content: message}]
+      model: "gpt-4o",
+      messages: [
+        {role: "system", content: "You are a JSON-only data extractor. Never include explanations or text outside JSON."},
+        {role: "user", content: message},
+      ]
     });
 
     return String(response.choices[0].message.content);
