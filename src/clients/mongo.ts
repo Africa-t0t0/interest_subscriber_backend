@@ -38,3 +38,36 @@ export async function getById<T>(Model: mongoose.Model<T>, id: string) {
         console.log(error);
     }
 };
+
+export async function getByField<T>(
+    Model: mongoose.Model<T>,
+    field: keyof T,
+    value: any
+): Promise<T | null> {
+    await connectToMongo();
+
+    try {
+        const query: Record<string, any> = {};
+        query[field as string] = value;
+        const result = await Model.findOne(query);
+        return result;
+    } catch (error) {
+        console.error('Error in getByField:', error);
+        return null;
+    }
+}
+
+export async function create<T>(
+    Model: mongoose.Model<T>,
+    data: mongoose.HydratedDocument<T> | Partial<T>
+  ) {
+    await connectToMongo();
+
+    try {
+      const result = await Model.create(data);
+      return result;
+    } catch (error) {
+      console.error("Error in create:", error);
+      return null;
+    }
+  }
