@@ -7,6 +7,8 @@ export interface IEvent extends Document {
     startDateRange: Date;
     endDateRange: Date;
     location?: string;
+    tags?: string[];
+    status?: "pending" | "active" | "completed" | "cancelled";
     interests: Types.ObjectId[];
 };
 
@@ -18,6 +20,8 @@ const EventSchema = new Schema<IEvent>({
     startDateRange: { type: Date, required: true },
     endDateRange: { type: Date, required: true},
     location: String,
+    tags: [String],
+    status: { type: String, enum: ["pending", "active", "completed", "cancelled"], default: "pending" },
     interests: [{ type: Schema.Types.ObjectId, ref: 'Interest' }]
 });
 
