@@ -1,19 +1,28 @@
 import { EventModel } from "../models/Event";
-import { InterestModel } from "../models/Interest";
+import { InterestModel, IInterest } from "../models/Interest";
 import { handleChat } from "../handlers/chatHandler";
 import { getAll } from "../clients/mongo";
-
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 export async function createEventsForInterests () {
 
-    const interests = await getAll(InterestModel);
+    const interests = await getAll(InterestModel).then((interests) => interests);
+    // fix this
 
-    const prompt = `I have this Mongoose model in TypeScript:
-        export interface IEvent extends Document {
+    const currentDate = new Date();
+    const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+    const currentYear = currentDate.getFullYear();
+
+    const prompt = `
+    Given the following list of interests: ${interests}
+
+Return a JSON array containing only the most recent ONGOING or UPCOMING event for each interest. Each event must:
+
+- Match the following structure:
+{
     title: string;
     description?: string;
     creationDate: Date;
@@ -21,37 +30,45 @@ export async function createEventsForInterests () {
     endDateRange: Date;
     location?: string;
     tags?: string[];
-    status?: "pending" | "active" | "completed" | "cancelled";
-    interests: Types.ObjectId[];
-};
+    status: "pending" | "active" | "completed" | "cancelled";
+    interests: string[];
+}
 
+- Be scheduled for the current month (${currentMonth}) of ${currentYear} or the upcoming month.
+- Be ONGOING (today is between startDateRange and endDateRange) or UPCOMING (startDateRange is in the future).
+- Be the most recent valid event per interest.
+- USE INTERNET TO SEARCH
+- Return at least 5 events per category
+- Return events that are relevant to the current date and time
 
-const EventSchema = new Schema<IEvent>({
-    title: { type: String, required: true },
-    description: String,
-    creationDate: { type: Date, default: Date.now },
-    startDateRange: { type: Date, required: true },
-    endDateRange: { type: Date, required: true},
-    location: String,
-    tags: [String],
-    status: { type: String, enum: ["pending", "active", "completed", "cancelled"], default: "pending" },
-    interests: [{ type: Schema.Types.ObjectId, ref: 'Interest' }]
-});
+Return only the final JSON array. No explanations or additional text.
 
-
-    Given the following list of interets: ${interests}
-
-    Please return an array of JSON objects containing the ONGOING and UPCOMING events, formatted to match the model I provided. Return only the JSON response, no additional explanations.
     `
 
     try {
         const response = await handleChat(prompt, "openai");
-        const events = JSON.parse(response);
+        const eventsWithStrings = JSON.parse(response);
+
+        if (!interests) {
+            throw new Error('No interests found in database');
+        }
+
+        // Convert interest names to ObjectIds
+        const events = eventsWithStrings.map((event: any) => {
+            const interestNames = event.interests as string[];
+            const interestObjectIds = interestNames.map(name => {
+                const interest = interests.find((i: IInterest) => i.name === name);
+                return interest?._id;
+            }).filter((id): id is Types.ObjectId => id !== undefined);
+            
+            return { ...event, interests: interestObjectIds };
+        });
 
         await EventModel.insertMany(events);
 
     } catch (error) {
-        console.log(error);
+        console.error('Error creating events:', error);
+        throw error;
     }
 };
 

@@ -7,13 +7,15 @@ const cors = require("cors");
 
 const app = express();
 const openaiRoutes = require("./routes/openai");
-const interestRoutes = require("./routes/interest");
+const interestRoutes = require("./routes/interests");
+const eventRoutes = require("./routes/events");
 
 app.use(cors())
 app.use(express.json())
 
 app.use('/openai', openaiRoutes);
-app.use('/api', interestRoutes);
+app.use('/interests-api', interestRoutes);
+app.use("/events-api", eventRoutes);
 
 const port : number = PORT;
 
