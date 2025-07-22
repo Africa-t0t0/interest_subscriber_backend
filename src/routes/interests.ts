@@ -3,6 +3,7 @@ import { getById, getAll, getByField } from "../clients/mongo";
 import { authMiddleware } from "../utils/authUtils";
 import { UserModel } from "../models/User";
 import { Types } from "mongoose";
+import { getInteresectionOfArrays } from "../utils/utils";
 
 const express = require('express');
 const router = express.Router();
@@ -62,14 +63,52 @@ router.post("/user-interests", authMiddleware, async (request: any, response: an
         }
 
         // get the user by email and then set the received interests to the user
-        console.log("request", request.body);
-        user.interests = request.body.interests;
+        const { interests } = request.body;
+        user.interests = interests;
+
+        let newInterests = await Promise.all(interests.map((interestId: Types.ObjectId) => {
+            return getById(InterestModel, interestId.toString());
+        }));
+
         await user.save();
-        response.json(user);
+        response.json(newInterests);
     } catch (error) {
         console.error(`Error fetching interest: ${error}`);
         response.status(500).json({ error: 'Failed to fetch interest' });
     }
+});
+
+router.patch("/user-interests", authMiddleware, async (request: any, response: any) => {
+    try {
+        const { email } = request.user;
+        const user = await getByField(UserModel, "email", email);
+        if (!user) {
+            return response.status(401).json({ error: "User not found" });
+        }
+
+        const { interests } = request.body;
+        // now instead of replacing the interests, we update the current user interests
+        const currentInterests = user.interests;
+
+        if (!currentInterests) {
+            return response.status(401).json({ error: "User not found" });
+        }
+
+        const updatedInterests = getInteresectionOfArrays(currentInterests, interests);
+        user.interests = updatedInterests;
+        await user.save();
+        let newInterests = await Promise.all(interests.map((interestId: Types.ObjectId) => {
+            return getById(InterestModel, interestId.toString());
+        }));
+        if (newInterests.length === 0) {
+            newInterests = [];
+        }
+
+        response.json(newInterests);
+    } catch (error) {
+        console.error(`Error fetching interest: ${error}`);
+        response.status(500).json({ error: 'Failed to fetch interest' });
+    };
 });
 
 module.exports = router;
